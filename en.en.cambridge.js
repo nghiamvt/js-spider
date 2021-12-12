@@ -2,6 +2,7 @@ class enen_Cambridge {
   constructor(options) {
     this.options = options;
     this.maxexample = 2;
+    this.word = '';
   }
 
   async displayName() {
@@ -14,6 +15,7 @@ class enen_Cambridge {
   }
 
   async findTerm(word) {
+    this.word = word;
     if (!word) return []; // empty notes
 
     try {
