@@ -6,7 +6,7 @@ class enen_Cambridge {
   }
 
   async displayName() {
-    return 'Cambridge EN->EN Dictionary';
+    return 'Cambridge English Dictionary';
   }
 
   setOptions(options) {
@@ -27,39 +27,41 @@ class enen_Cambridge {
     }
   }
 
+  T(node) {
+    return (!node) ? '' : node.innerText.trim();
+  }
+
+  parseIPA(entry) {
+    // IPA US, UK
+    let reading = '';
+    let readings = entry.querySelectorAll('.pron .ipa');
+    if (readings) {
+        let reading_us = this.T(readings[1]);
+        reading = reading_us ? `/${reading_us}/` : '';
+    }
+
+    return reading;
+  }
+
   parseHTML(doc) {
     let notes = [];
-
-    function T(node) {
-      return (!node) ? '' : node.innerText.trim();
-    }
 
     // a word can have multiple types such as noun, adjective...
     const entries = doc.querySelectorAll('.pr .entry-body__el') || [];
     for (const entry of entries) {
       // final word because search word can be in popular form.
-      const expression = T(entry.querySelector('.headword'));
+      const word = this.T(entry.querySelector('.headword'));
 
-      // IPA US, UK
-      let reading = '';
-      let readings = entry.querySelectorAll('.pron .ipa');
-      if (readings) {
-          let reading_us = T(readings[1]);
-          reading = reading_us ? `/${reading_us}/` : '';
-      }
-      
       // get word type such as noun, verb, or adj
-      let pos = T(entry.querySelector('.posgram'));
+      let pos = this.T(entry.querySelector('.posgram'));
       pos = pos ? `<span class='pos'>${pos}</span>` : '';
       
       // sounds, get both us & uk here because we can change default in the extension
       let audios = [];
       audios[0] = entry.querySelector(".uk.dpron-i source");
       audios[0] = audios[0] ? 'https://dictionary.cambridge.org' + audios[0].getAttribute('src') : '';
-      //audios[0] = audios[0].replace('https', 'http');
       audios[1] = entry.querySelector(".us.dpron-i source");
       audios[1] = audios[1] ? 'https://dictionary.cambridge.org' + audios[1].getAttribute('src') : '';
-      //audios[1] = audios[1].replace('https', 'http');
 
       let definitions = [];
       let sensbodys = entry.querySelectorAll('.sense-body') || [];
@@ -69,7 +71,7 @@ class enen_Cambridge {
           let phrasehead = '';
           let defblocks = [];
           if (sensblock.classList && sensblock.classList.contains('phrase-block')) {
-              phrasehead = T(sensblock.querySelector('.phrase-title'));
+              phrasehead = this.T(sensblock.querySelector('.phrase-title'));
               phrasehead = phrasehead ? `<div class="phrasehead">${phrasehead}</div>` : '';
               defblocks = sensblock.querySelectorAll('.def-block') || [];
           }
@@ -80,24 +82,20 @@ class enen_Cambridge {
 
           // make definition segement
           for (const defblock of defblocks) {
-            let eng_tran = T(defblock.querySelector('.ddef_h .def'));
-            let chn_tran = T(defblock.querySelector('.def-body .trans'));
-            if (!eng_tran) continue;
-            let definition = '';
-            eng_tran = `<span class='eng_tran'>${eng_tran.replace(RegExp(expression, 'gi'),`<b>${expression}</b>`)}</span>`;
-            chn_tran = `<span class='chn_tran'>${chn_tran}</span>`;
-            let tran = `<span class='tran'>${eng_tran}${chn_tran}</span>`;
-            definition += phrasehead ? `${phrasehead}${tran}` : `${pos}${tran}`;
+            let def = this.T(defblock.querySelector('.ddef_h .def'));
+            let def_info = this.T(defblock.querySelector('.ddef_h .def-info')); // B1, B2, C1, C2
+            if (!def) continue;
+            let definition = phrasehead || '';
+            definition += def_info ? `<span class='def_info'>${def_info}</span>` : '';
+            definition += def ? `<span class='def'>${def}</span>` : '';
 
             // make exmaple segement
-            let examps = defblock.querySelectorAll('.def-body .examp') || [];
-            if (examps.length > 0 && this.maxexample > 0) {
-              definition += '<ul class="sents">';
-              for (const [index, examp] of examps.entries()) {
+            let examples = defblock.querySelectorAll('.def-body .examp') || [];
+            if (examples.length > 0 && this.maxexample > 0) {
+              definition += '<ul class="examples">';
+              for (const [index, examp] of examples.entries()) {
                 if (index > this.maxexample - 1) break; // to control only 2 example sentence.
-                let eng_examp = T(examp.querySelector('.eg'));
-                let chn_examp = T(examp.querySelector('.trans'));
-                definition += `<li class='sent'><span class='eng_sent'>${eng_examp.replace(RegExp(expression, 'gi'),`<b>${expression}</b>`)}</span><span class='chn_sent'>${chn_examp}</span></li>`;
+                definition += `<li class='example'>${this.T(examp)}</li>`;
               }
               definition += '</ul>';
             }
@@ -106,7 +104,7 @@ class enen_Cambridge {
         }
       }
       const css = this.renderCSS();
-      notes.push({ expression, audios, definitions, reading, css });
+      notes.push({ expression: word, audios, definitions, reading: this.parseIPA(entry), css });
     }
 
     return notes;
@@ -117,14 +115,11 @@ class enen_Cambridge {
       <style>
         div.phrasehead{margin: 2px 0;font-weight: bold;}
         span.star {color: #FFBB00;}
-        span.pos  {text-transform:lowercase; font-size:0.9em; margin-right:5px; padding:2px 4px; color:white; background-color:#0d47a1; border-radius:3px;}
-        span.tran {margin:0; padding:0;}
-        span.eng_tran {margin-right:3px; padding:0;}
-        span.chn_tran {color:#0d47a1;}
-        ul.sents {font-size:0.8em; list-style:square inside; margin:3px 0;padding:5px;background:rgba(13,71,161,0.1); border-radius:5px;}
-        li.sent  {margin:0; padding:0;}
+        span.def_info  {text-transform:lowercase; font-size:0.9em; margin-right:5px; padding:2px 4px; color:white; background-color:#0d47a1; border-radius:3px;}
+        span.def {margin-right:3px; padding:0;}
+        ul.examples {font-size:0.8em; list-style:square inside; margin:3px 0;padding:5px;background:rgba(13,71,161,0.1); border-radius:5px;}
+        li.example  {margin:0; padding:0;}
         span.eng_sent {margin-right:5px;}
-        span.chn_sent {color:#0d47a1;}
       </style>`;
   }
 }
