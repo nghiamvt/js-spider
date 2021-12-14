@@ -21,7 +21,18 @@ class enen_Cambridge {
     try {
       const parser = new DOMParser();
       const data = await api.fetch(`https://dictionary.cambridge.org/dictionary/english/${encodeURIComponent(word)}`);
-      return this.parseHTML(parser.parseFromString(data, 'text/html'));
+      const doc = parser.parseFromString(data, 'text/html');
+
+      let notes = [];
+
+      // parts of speech: noun, adjective...
+      const partsOfSpeech = doc.querySelectorAll('.entry .entry-body__el') || [];
+      for (const posEntry of partsOfSpeech) {
+        notes.push(this.parsePartOfSpeech(posEntry));
+      }
+  
+      return notes;
+      
     } catch (err) {
         return [];
     }
@@ -43,71 +54,72 @@ class enen_Cambridge {
     return reading;
   }
 
-  parseHTML(doc) {
-    let notes = [];
+  parseAudios(entry) {
+    // sounds, get both us & uk here because we can change default in the extension
+    let audios = [];
+    audios[0] = entry.querySelector(".uk.dpron-i source");
+    audios[0] = audios[0] ? 'https://dictionary.cambridge.org' + audios[0].getAttribute('src') : '';
+    audios[1] = entry.querySelector(".us.dpron-i source");
+    audios[1] = audios[1] ? 'https://dictionary.cambridge.org' + audios[1].getAttribute('src') : '';
 
-    // a word can have multiple types such as noun, adjective...
-    const entries = doc.querySelectorAll('.pr .entry-body__el') || [];
-    for (const entry of entries) {
-      // final word because search word can be in popular form.
-      const word = this.T(entry.querySelector('.headword'));
+    return audios;
+  }
 
-      // get word type such as noun, verb, or adj
-      let pos = this.T(entry.querySelector('.posgram'));
-      pos = pos ? `<span class='pos'>${pos}</span>` : '';
-      
-      // sounds, get both us & uk here because we can change default in the extension
-      let audios = [];
-      audios[0] = entry.querySelector(".uk.dpron-i source");
-      audios[0] = audios[0] ? 'https://dictionary.cambridge.org' + audios[0].getAttribute('src') : '';
-      audios[1] = entry.querySelector(".us.dpron-i source");
-      audios[1] = audios[1] ? 'https://dictionary.cambridge.org' + audios[1].getAttribute('src') : '';
+  // a part of speech has many senses (meanings)
+  parsePartOfSpeech(posEntry) {
+    // final word because search word can be in popular form.
+    const headword = this.T(posEntry.querySelector('.headword'));
 
-      let definitions = [];
-      let sensbodys = entry.querySelectorAll('.sense-body') || [];
-      for (const sensbody of sensbodys) {
-        let sensblocks = sensbody.childNodes || [];
-        for (const sensblock of sensblocks) {
-          let phrasehead = '';
-          let defblocks = [];
-          if (sensblock.classList && sensblock.classList.contains('phrase-block')) {
-              phrasehead = this.T(sensblock.querySelector('.phrase-title'));
-              phrasehead = phrasehead ? `<div class="phrasehead">${phrasehead}</div>` : '';
-              defblocks = sensblock.querySelectorAll('.def-block') || [];
-          }
-          if (sensblock.classList && sensblock.classList.contains('def-block')) {
-              defblocks = [sensblock];
-          }
-          if (defblocks.length <= 0) continue;
+    let definitions = [];
+    let senses = posEntry.querySelectorAll('.pos-body .dsense') || [];
+    for (const sense of senses) {
+      const senseHeader = this.T(sense.querySelector(' > .dsense_h'));
+      const senseBodies = sense.querySelector('.sense-body') || [];
+      let senseBlocks = senseBodies.childNodes || [];
+      for (const sensblock of senseBlocks) {
+        let phrasehead = '';
+        let defblocks = [];
+        if (sensblock.classList && sensblock.classList.contains('phrase-block')) {
+            phrasehead = this.T(sensblock.querySelector('.phrase-title'));
+            phrasehead = phrasehead ? `<div class="phrasehead">${phrasehead}</div>` : '';
+            defblocks = sensblock.querySelectorAll('.def-block') || [];
+        }
+        if (sensblock.classList && sensblock.classList.contains('def-block')) {
+            defblocks = [sensblock];
+        }
+        if (defblocks.length <= 0) continue;
 
-          // make definition segement
-          for (const defblock of defblocks) {
-            let def = this.T(defblock.querySelector('.ddef_h .def'));
-            let def_info = this.T(defblock.querySelector('.ddef_h .def-info')); // B1, B2, C1, C2
-            if (!def) continue;
-            let definition = phrasehead || '';
-            definition += def_info ? `<span class='def_info'>${def_info}</span>` : '';
-            definition += def ? `<span class='def'>${def}</span>` : '';
+        // make definition segement
+        for (const defblock of defblocks) {
+          let def = this.T(defblock.querySelector('.ddef_h .def'));
+          let def_info = this.T(defblock.querySelector('.ddef_h .def-info')); // B1, B2, C1, C2
+          if (!def) continue;
+          let definition = phrasehead || '';
+          definition += def_info ? `<span class='def_info'>${senseHeader}----${def_info.toUpperCase()}</span>` : '';
+          definition += def ? `<span class='def'>${def}</span>` : '';
 
-            // make exmaple segement
-            let examples = defblock.querySelectorAll('.def-body .examp') || [];
-            if (examples.length > 0 && this.maxexample > 0) {
-              definition += '<ul class="examples">';
-              for (const [index, examp] of examples.entries()) {
-                if (index > this.maxexample - 1) break; // to control only 2 example sentence.
-                definition += `<li class='example'>${this.T(examp)}</li>`;
-              }
-              definition += '</ul>';
+          // make exmaple segement
+          let examples = defblock.querySelectorAll('.def-body .examp') || [];
+          if (examples.length > 0 && this.maxexample > 0) {
+            definition += '<ul class="examples">';
+            for (const [index, examp] of examples.entries()) {
+              if (index > this.maxexample - 1) break; // to control only 2 example sentence.
+              definition += `<li class='example'>${this.T(examp)}</li>`;
             }
-            definition && definitions.push(definition);
+            definition += '</ul>';
           }
+          definition && definitions.push(definition);
         }
       }
-      const css = this.renderCSS();
-      notes.push({ expression: word, audios, definitions, reading: this.parseIPA(entry), css });
     }
 
-    return notes;
+    return { 
+      expression: headword, 
+      audios: this.parseAudios(posEntry), 
+      definitions, 
+      reading: this.parseIPA(posEntry), 
+      css: this.renderCSS(),
+    };
   }
 
   renderCSS() {
