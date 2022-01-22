@@ -100,10 +100,10 @@ class enen_Cambridge {
           let definition = ''
           definition += guideword ? `<span class='def_info'>${guideword}</span>` : '';
           definition += dgram || '';
-          definition += word_type ? `(${word_type})` : '';
+          definition += word_type ? ` (${word_type}) ` : '';
           definition += phrasehead;
           definition += definition ? '<br />' : '';
-          definition += def_info ? `<span class='def_info'>${def_info}</span>` : '';
+          definition += def_info ? `[${def_info}]` : '';
           definition += def ? `<span class='def'>${def}</span>` : '';
 
           // make exmaple segement
