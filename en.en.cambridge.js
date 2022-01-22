@@ -99,11 +99,11 @@ class enen_Cambridge {
           let def_info = this.T(defblock.querySelector('.epp-xref.dxref')); // A1, A2, B1, B2, C1, C2
           let definition = ''
           definition += guideword ? `<span class='def_info'>${guideword}</span>` : '';
-          definition += word_type;
-          definition += def_info ? `<span class='def_info'>${def_info}</span>` : '';
           definition += dgram || '';
+          definition += word_type ? `(${word_type})` : '';
           definition += phrasehead;
           definition += definition ? '<br />' : '';
+          definition += def_info ? `<span class='def_info'>${def_info}</span>` : '';
           definition += def ? `<span class='def'>${def}</span>` : '';
 
           // make exmaple segement
