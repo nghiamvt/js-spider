@@ -74,7 +74,7 @@ class enen_Cambridge {
     let senses = posEntry.querySelectorAll('.pos-body .dsense') || [];
     for (const sense of senses) {
       const guideword = this.T(sense.querySelector('.dsense_h .guideword')).replace(/[()]/g, '');
-      const dgram = this.T(sense.querySelector('.gram.dgram')).replace(/\s/g, '');; // [C], [U], [S], [T]
+      const dgram = this.T(sense.querySelector('.gram.dgram')); // [C], [U], [S], [T]
       const word_type = this.T(sense.querySelector('.pos.dsense_pos')); // verb, noun, adj
 
       const senseBodies = sense.querySelector('.sense-body') || [];
