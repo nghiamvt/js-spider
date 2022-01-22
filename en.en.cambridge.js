@@ -73,8 +73,8 @@ class enen_Cambridge {
     let definitions = [];
     let senses = posEntry.querySelectorAll('.pos-body .dsense') || [];
     for (const sense of senses) {
-      const dgram = this.T(sense.querySelector('.dsense_h .dgram'));
-      const guideword = this.T(sense.querySelector('.dsense_h .guideword'));
+      const guideword = this.T(sense.querySelector('.dsense_h .guideword')).replace(/(|)/, '');
+      const dgram = this.T(sense.querySelector('.dsense_h .dgram')); // [C], [U], [S], [T]
 
       const senseBodies = sense.querySelector('.sense-body') || [];
       let senseBlocks = senseBodies.childNodes || [];
@@ -94,12 +94,12 @@ class enen_Cambridge {
         // make definition segement
         for (const defblock of defblocks) {
           let def = this.T(defblock.querySelector('.ddef_h .def'));
-          let def_info = this.T(defblock.querySelector('.ddef_h .def-info')); // B1, B2, C1, C2
           if (!def) continue;
+          let def_info = this.T(defblock.querySelector('.ddef_h .def-info')); // B1, B2, C1, C2
           let definition = ''
-          definition += dgram || guideword ? `<div class='def_info'>${dgram} ${guideword}</div>` : '';
+          definition += guideword ? `<span class='def_info'>${guideword}</span>` : '';
           definition += phrasehead || '';
-          definition += def_info ? `<span class='def_info'>${def_info.toUpperCase()}</span>` : '';
+          definition += def_info ? `<span class='def_info'>${def_info} ${dgram}</span>` : '';
           definition += def ? `<span class='def'>${def}</span>` : '';
 
           // make exmaple segement
@@ -130,8 +130,7 @@ class enen_Cambridge {
     return `
       <style>
         div.phrasehead{margin: 2px 0;font-weight: bold;}
-        span.star {color: #FFBB00;}
-        span.def_info  {font-size:0.9em; margin-right:5px; padding:2px 4px; color:white; background-color:#0d47a1; border-radius:3px;}
+        .def_info  {font-size:0.9em; margin-right:5px; padding:2px 4px; color:white; background-color:#0d47a1; border-radius:3px;}
         span.def {margin-right:3px; padding:0;}
         ul.examples {font-size:0.8em; list-style:square inside; margin:3px 0;padding:5px;background:rgba(13,71,161,0.1); border-radius:5px;}
         li.example  {margin:0; padding:0;}
