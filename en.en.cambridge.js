@@ -75,6 +75,7 @@ class enen_Cambridge {
     for (const sense of senses) {
       const guideword = this.T(sense.querySelector('.dsense_h .guideword')).replace(/[()]/g, '');
       const dgram = this.T(sense.querySelector('.dsense_h .dgram')); // [C], [U], [S], [T]
+      const word_type = this.T(sense.querySelector('.pos .dsense_pos')); // verb, noun, adj
 
       const senseBodies = sense.querySelector('.sense-body') || [];
       let senseBlocks = senseBodies.childNodes || [];
@@ -96,14 +97,13 @@ class enen_Cambridge {
           let def = this.T(defblock.querySelector('.ddef_h .def'));
           if (!def) continue;
           let def_info = this.T(defblock.querySelector('.epp-xref .dxref')); // B1, B2, C1, C2
-          let word_type = this.T(defblock.querySelector('.pos .dsense_pos')); // verb, noun, adj
           let definition = ''
           definition += guideword ? `<span class='def_info'>${guideword}</span>` : '';
           definition += word_type;
           definition += phrasehead;
           definition += def_info ? `<span class='def_info'>${def_info}</span>${dgram}` : '';
           definition += dgram || '';
-          definition += def ? `<p class='def'>${def}</p>` : '';
+          definition += def ? `<br /><span class='def'>${def}</span>` : '';
 
           // make exmaple segement
           let examples = defblock.querySelectorAll('.def-body .examp') || [];
