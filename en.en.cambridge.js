@@ -104,7 +104,7 @@ class enen_Cambridge {
           definition += phrasehead;
           definition += definition ? '<br />' : '';
           definition += def_info ? `[${def_info}]` : '';
-          definition += def ? `<span class='def'>${def}</span>` : '';
+          definition += def ? `<span class='def'> ${def}</span>` : '';
 
           // make exmaple segement
           let examples = defblock.querySelectorAll('.def-body .examp') || [];
