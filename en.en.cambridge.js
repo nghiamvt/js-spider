@@ -95,12 +95,15 @@ class enen_Cambridge {
         for (const defblock of defblocks) {
           let def = this.T(defblock.querySelector('.ddef_h .def'));
           if (!def) continue;
-          let def_info = this.T(defblock.querySelector('.ddef_h .epp-xref .dxref')); // B1, B2, C1, C2
+          let def_info = this.T(defblock.querySelector('.epp-xref .dxref')); // B1, B2, C1, C2
+          let word_type = this.T(defblock.querySelector('.pos .dsense_pos')); // verb, noun, adj
           let definition = ''
           definition += guideword ? `<span class='def_info'>${guideword}</span>` : '';
+          definition += word_type;
           definition += phrasehead;
           definition += def_info ? `<span class='def_info'>${def_info}</span>${dgram}` : '';
-          definition += def ? `<span class='def'>${def}</span>` : '';
+          definition += dgram || '';
+          definition += def ? `<p class='def'>${def}</p>` : '';
 
           // make exmaple segement
           let examples = defblock.querySelectorAll('.def-body .examp') || [];
@@ -131,7 +134,7 @@ class enen_Cambridge {
       <style>
         div.phrasehead{margin: 2px 0;font-weight: bold;}
         .def_info  {font-size:0.9em; margin-right:5px; padding:2px 4px; color:white; background-color:#0d47a1; border-radius:3px;}
-        span.def {margin-right:3px; padding:0;}
+        .def {margin-right:3px; padding:0;}
         ul.examples {font-size:0.8em; list-style:square inside; margin:3px 0;padding:5px;background:rgba(13,71,161,0.1); border-radius:5px;}
         li.example  {margin:0; padding:0;}
         span.eng_sent {margin-right:5px;}
