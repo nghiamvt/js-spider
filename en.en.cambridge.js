@@ -74,8 +74,8 @@ class enen_Cambridge {
     let senses = posEntry.querySelectorAll('.pos-body .dsense') || [];
     for (const sense of senses) {
       const guideword = this.T(sense.querySelector('.dsense_h .guideword')).replace(/[()]/g, '');
-      const dgram = this.T(sense.querySelector('.dsense_h .dgram')); // [C], [U], [S], [T]
-      const word_type = this.T(sense.querySelector('.pos .dsense_pos')); // verb, noun, adj
+      const dgram = this.T(sense.querySelector('.gram.dgram')); // [C], [U], [S], [T]
+      const word_type = this.T(sense.querySelector('.pos.dsense_pos')); // verb, noun, adj
 
       const senseBodies = sense.querySelector('.sense-body') || [];
       let senseBlocks = senseBodies.childNodes || [];
@@ -96,14 +96,15 @@ class enen_Cambridge {
         for (const defblock of defblocks) {
           let def = this.T(defblock.querySelector('.ddef_h .def'));
           if (!def) continue;
-          let def_info = this.T(defblock.querySelector('.epp-xref .dxref')); // B1, B2, C1, C2
+          let def_info = this.T(defblock.querySelector('.epp-xref.dxref')); // A1, A2, B1, B2, C1, C2
           let definition = ''
           definition += guideword ? `<span class='def_info'>${guideword}</span>` : '';
           definition += word_type;
-          definition += phrasehead;
-          definition += def_info ? `<span class='def_info'>${def_info}</span>${dgram}` : '';
+          definition += def_info ? `<span class='def_info'>${def_info}</span>` : '';
           definition += dgram || '';
-          definition += def ? `<br /><span class='def'>${def}</span>` : '';
+          definition += phrasehead;
+          definition += definition ? '<br />' : '';
+          definition += def ? `<span class='def'>${def}</span>` : '';
 
           // make exmaple segement
           let examples = defblock.querySelectorAll('.def-body .examp') || [];
