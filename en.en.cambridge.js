@@ -43,7 +43,7 @@ class enen_Oxford {
     let senses = posEntry.querySelectorAll(".pos-body .dsense") || [];
     for (const sense of senses) {
       const guideword = this.T(sense.querySelector(".dsense_h .guideword")).replace(/[()]/g, "");
-      const dgram = this.T(sense.querySelector(".gram.dgram")); // [C], [U], [S], [T]
+      const code = this.T(sense.querySelector(".gram.dgram")); // [C], [U], [S], [T]
       const word_type = this.T(sense.querySelector(".pos.dsense_pos")); // verb, noun, adj
 
       const senseBodies = sense.querySelector(".sense-body") || [];
@@ -53,7 +53,7 @@ class enen_Oxford {
         let defblocks = [];
         if (sensblock.classList && sensblock.classList.contains("phrase-block")) {
           phrasehead = this.T(sensblock.querySelector(".phrase-title"));
-          phrasehead = phrasehead ? `<div class="word">${phrasehead}</div>` : "";
+          phrasehead = phrasehead ? `<div class="phrasehead">${phrasehead}</div>` : "";
           defblocks = sensblock.querySelectorAll(".def-block") || [];
         }
         if (sensblock.classList && sensblock.classList.contains("def-block")) {
@@ -63,17 +63,18 @@ class enen_Oxford {
 
         // make definition segement
         for (const defblock of defblocks) {
-          let def = this.T(defblock.querySelector(".ddef_h .def"));
+          const def = this.T(defblock.querySelector(".ddef_h .def"));
           if (!def) continue;
-          let def_info = this.T(defblock.querySelector(".epp-xref.dxref")); // A1, A2, B1, B2, C1, C2
+          const level = this.T(defblock.querySelector(".epp-xref.dxref")); // A1, A2, B1, B2, C1, C2
           let definition = "";
-          definition += guideword ? `<span class='def_info'>${guideword}</span>` : "";
-          definition += dgram || "";
-          definition += word_type ? ` (${word_type}) ` : "";
+          definition += "<div>";
+          definition += word_type ? `<span class='code'>(${word_type})</span> ` : "";
+          definition += guideword ? `<b class='guideword'>${guideword}</b> ` : "";
+          definition += level ? `<span class='level'>${level}</span> ` : "";
+          definition += code ? ` <span class='code'>${code}</span> ` : "";
           definition += phrasehead;
-          definition += definition ? "<br />" : "";
-          definition += def_info ? `[${def_info}]` : "";
-          definition += def ? `<span class='def'> ${def}</span>` : "";
+          definition += "</div>";
+          definition += def ? `<div class='def'>${def}</div>` : "";
 
           // make exmaple segement
           let examples = defblock.querySelectorAll(".def-body .examp") || [];
@@ -81,7 +82,7 @@ class enen_Oxford {
             definition += '<ul class="examples">';
             for (const [index, examp] of examples.entries()) {
               if (index > this.maxexample - 1) break; // to control only 2 example sentence.
-              definition += `<li class='example'>${this.T(examp)}</li>`;
+              definition += `<li>${this.T(examp)}</li>`;
             }
             definition += "</ul>";
           }
