@@ -25,14 +25,11 @@ class enen_Oxford {
 
   parseAudios(entry) {
     // sounds, get both us & uk here because we can change default in the extension
-    // const Audio_UK = entry.querySelector('#audio1 source[type="audio/mpeg"]').src;
-    // const Audio_US = entry.querySelector('#audio2 source[type="audio/mpeg"]').src;
-    // return [Audio_UK, Audio_US];
     let audios = [];
-    audios[0] = entry.querySelector('.uk.dpron-i source[type="audio/mpeg"]');
-    audios[0] = audios[0] ? audios[0].src : "";
-    audios[1] = entry.querySelector('.us.dpron-i source[type="audio/mpeg"]');
-    audios[1] = audios[1] ? audios[1].src : "";
+    audios[0] = entry.querySelector(".uk.dpron-i source");
+    audios[0] = audios[0] ? "https://dictionary.cambridge.org" + audios[0].getAttribute("src") : "";
+    audios[1] = entry.querySelector(".us.dpron-i source");
+    audios[1] = audios[1] ? "https://dictionary.cambridge.org" + audios[1].getAttribute("src") : "";
 
     return audios;
   }
