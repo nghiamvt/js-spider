@@ -14,24 +14,6 @@ class enen_Oxford {
     this.maxexample = options.maxexample;
   }
 
-  async findTerm(word) {
-    this.word = word;
-    if (!word) return []; // empty notes
-
-    try {
-      const parser = new DOMParser();
-      const data = await api.fetch(`https://dictionary.cambridge.org/dictionary/english/${encodeURIComponent(word)}`);
-      const doc = parser.parseFromString(data, "text/html");
-
-      // parts of speech: noun, adjective...
-      const partsOfSpeech = doc.querySelectorAll(".entry .entry-body__el") || [];
-      return partsOfSpeech.map((posEntry) => this.parsePartOfSpeech(posEntry));
-    } catch (err) {
-      console.error("findTerm: ", err);
-      return [];
-    }
-  }
-
   T(node) {
     return !node ? "" : node.innerText.trim();
   }
@@ -115,5 +97,25 @@ class enen_Oxford {
       reading: this.parseIPA(posEntry),
       css: "",
     };
+  }
+
+  async findTerm(word) {
+    this.word = word;
+    if (!word) return []; // empty notes
+
+    try {
+      const parser = new DOMParser();
+      const data = await api.fetch(`https://dictionary.cambridge.org/dictionary/english/${encodeURIComponent(word)}`);
+      const doc = parser.parseFromString(data, "text/html");
+
+      let notes = [];
+      const entries = doc.querySelectorAll(".entry .entry-body__el") || [];
+      for (const entry of entries) {
+        notes.push(this.parsePartOfSpeech(entry));
+      }
+      return notes;
+    } catch (err) {
+      return [];
+    }
   }
 }
