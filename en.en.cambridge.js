@@ -27,6 +27,7 @@ class enen_Oxford {
       const partsOfSpeech = doc.querySelectorAll(".entry .entry-body__el") || [];
       return partsOfSpeech.map((posEntry) => this.parsePartOfSpeech(posEntry));
     } catch (err) {
+      console.error("findTerm: ", err);
       return [];
     }
   }
