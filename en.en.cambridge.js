@@ -48,17 +48,6 @@ class enen_Oxford {
     return [Audio_UK, Audio_US];
   }
 
-  renderCSS() {
-    return `
-      <style>
-        .def_info  {font-size:0.9em; margin-right:5px; padding:2px 4px; color:white; background-color:#0d47a1; border-radius:3px;}
-        .def {margin-right:3px; padding:0;}
-        ul.examples {font-size:0.8em; list-style:square inside; margin:3px 0;padding:5px;background:rgba(13,71,161,0.1); border-radius:5px;}
-        li.example  {margin:0; padding:0;}
-        span.eng_sent {margin-right:5px;}
-      </style>`;
-  }
-
   // a part of speech has many senses (meanings)
   parsePartOfSpeech(posEntry) {
     // final word because search word can be in popular form.
@@ -120,7 +109,7 @@ class enen_Oxford {
       audios: this.parseAudios(posEntry),
       definitions,
       reading: this.parseIPA(posEntry),
-      css: this.renderCSS(),
+      // css: '',
     };
   }
 }
