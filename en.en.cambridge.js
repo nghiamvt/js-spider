@@ -50,7 +50,6 @@ class enen_Oxford {
   renderCSS() {
     return `
       <style>
-        div.phrasehead{margin: 2px 0;font-weight: bold;}
         .def_info  {font-size:0.9em; margin-right:5px; padding:2px 4px; color:white; background-color:#0d47a1; border-radius:3px;}
         .def {margin-right:3px; padding:0;}
         ul.examples {font-size:0.8em; list-style:square inside; margin:3px 0;padding:5px;background:rgba(13,71,161,0.1); border-radius:5px;}
@@ -78,7 +77,7 @@ class enen_Oxford {
         let defblocks = [];
         if (sensblock.classList && sensblock.classList.contains("phrase-block")) {
           phrasehead = this.T(sensblock.querySelector(".phrase-title"));
-          phrasehead = phrasehead ? `<div class="phrasehead">${phrasehead}</div>` : "";
+          phrasehead = phrasehead ? `<div class="word">${phrasehead}</div>` : "";
           defblocks = sensblock.querySelectorAll(".def-block") || [];
         }
         if (sensblock.classList && sensblock.classList.contains("def-block")) {
