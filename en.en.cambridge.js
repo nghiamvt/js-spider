@@ -37,7 +37,8 @@ class enen_Oxford {
 
   parseIPA(entry) {
     // const IPA_UK this.T(entry.querySelectorAll(".pos-header .uk .ipa")[0]); // IPA UK
-    return this.T(entry.querySelectorAll(".pos-header .us .ipa")[0]); // IPA US
+    // return this.T(entry.querySelectorAll(".pos-header .us .ipa")[0]); // IPA US
+    return "1";
   }
 
   parseAudios(entry) {
