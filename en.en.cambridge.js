@@ -24,17 +24,8 @@ class enen_Oxford {
       const doc = parser.parseFromString(data, "text/html");
 
       // parts of speech: noun, adjective...
-      // const partsOfSpeech = doc.querySelectorAll(".entry .entry-body__el") || [];
-      // return partsOfSpeech.map((posEntry) => this.parsePartOfSpeech(posEntry));
-      let notes = [];
-
-      // parts of speech: noun, adjective...
       const partsOfSpeech = doc.querySelectorAll(".entry .entry-body__el") || [];
-      for (const posEntry of partsOfSpeech) {
-        notes.push(this.parsePartOfSpeech(posEntry));
-      }
-
-      return notes;
+      return partsOfSpeech.map((posEntry) => this.parsePartOfSpeech(posEntry));
     } catch (err) {
       return [];
     }
