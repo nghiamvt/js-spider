@@ -6,7 +6,7 @@ class enen_Oxford {
   }
 
   async displayName() {
-    return "Oxford English Dictionary";
+    return "Cambridge English Dictionary";
   }
 
   setOptions(options) {
@@ -109,7 +109,7 @@ class enen_Oxford {
       audios: this.parseAudios(posEntry),
       definitions,
       reading: this.parseIPA(posEntry),
-      // css: '',
+      css: "",
     };
   }
 }
