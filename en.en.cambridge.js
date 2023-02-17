@@ -25,13 +25,9 @@ class enen_Oxford {
 
   parseAudios(entry) {
     // sounds, get both us & uk here because we can change default in the extension
-    // const Audio_UK = entry.querySelector('#audio1 source[type="audio/mpeg"]').src;
-    // const Audio_US = entry.querySelector('#audio2 source[type="audio/mpeg"]').src;
-    // return [Audio_UK, Audio_US];
-    return [
-      "https://dictionary.cambridge.org/media/english/uk_pron/u/uks/uksec/uksecul006.mp3",
-      "https://dictionary.cambridge.org/media/english/uk_pron/u/uks/uksec/uksecul006.mp3",
-    ];
+    const Audio_UK = entry.querySelector('#audio1 source[type="audio/mpeg"]').src;
+    const Audio_US = entry.querySelector('#audio2 source[type="audio/mpeg"]').src;
+    return [Audio_UK, Audio_US];
   }
 
   // a part of speech has many senses (meanings)
